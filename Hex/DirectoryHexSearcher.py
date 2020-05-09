@@ -29,8 +29,9 @@ def read_directory(directory):
     Scans the given directory recursively and parses any files within
     :param directory: Current directory to scan
     """
-    for path in Path(directory).rglob("*.*"):
-        read_file(path)
+    for path in Path(directory).rglob("*"):
+        if path.is_file():
+            read_file(path)
 
 
 def read_file(file_path):
