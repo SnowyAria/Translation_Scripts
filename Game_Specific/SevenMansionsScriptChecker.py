@@ -23,6 +23,13 @@ slash_regex = re.compile("\\\[^n]")
 highlight_regex = re.compile("\$\d(.*?)\$\d")
 highlight_start_regex = re.compile("(.+?)\$[0-6]")
 reina_pointer_regex = re.compile("(.*)&d")
+space_after_newline_regex = re.compile("\\\[n](\$\d)?\s")
+punctuation_in_highlight_regex = re.compile("\$.*(\.|\?|\!)\$\d")
+space_before_punctuation_regex = re.compile("\s\$\d(\.|\?|\!)")
+new_dialog_with_highlight_regex = re.compile("(.*)&p.*\$")
+new_dialog_regex = re.compile("(.*)&p")
+space_after_pointer_regex = re.compile("&.\s")
+double_space_regex = re.compile("[ ]\$\d[ ][^\\\]")
 errors = 0
 
 
@@ -136,6 +143,112 @@ def check_for_line_length(translated_line, line_number):
             errors += 1
 
 
+def check_for_space_after_newline(translated_line, line_number):
+    """
+    Spaces after newlines create a bad look. Avoid them.
+    :param translated_line: Current line from the translated script
+    :param line_number: Current line number for output
+    :return:
+    """
+    global errors
+    match_newline_spaces = space_after_newline_regex.findall(translated_line)
+
+    for match in match_newline_spaces:
+        print("Space after newline on line " + str(line_number + 1))
+        errors += 1
+
+
+def check_for_punctuation_in_highlight(translated_line, line_number):
+    """
+    Punctuation marks do not belong in highlights
+    :param translated_line: Current line from the translated script
+    :param line_number: Current line number for output
+    :return:
+    """
+    global errors
+    match_punctuation = punctuation_in_highlight_regex.findall(translated_line)
+
+    for match in match_punctuation:
+        print("Punctuation in highlight in line " + str(line_number + 1))
+        errors += 1
+
+
+def check_for_space_before_punctuation(translated_line, line_number):
+    """
+    Punctuation marks do not belong in highlights
+    :param translated_line: Current line from the translated script
+    :param line_number: Current line number for output
+    :return:
+    """
+    global errors
+    match_space = space_before_punctuation_regex.findall(translated_line)
+
+    for match in match_space:
+        print("Space before punctuation in line " + str(line_number + 1))
+        errors += 1
+
+
+def check_for_new_dialog_spacing(translated_line, line_number):
+    """
+    &p tags work okay on odd bytes somehow, but if they're on odd bytes, then the highlighting after
+    has to be odd as well. Find all &p tags that have highlights after them, then check their position
+    :return:
+    """
+    global errors
+    match_dialog = new_dialog_with_highlight_regex.findall(translated_line)
+
+    for match in match_dialog:
+        match_size = new_dialog_regex.findall(translated_line)
+        for size_match in match_size:
+            if len(size_match) % 2 == 1:
+                print("&p start spacing is odd on line " + str(line_number + 1))
+                errors += 1
+
+
+def check_for_space_after_pointer(translated_line, line_number):
+    """
+    We want to avoid spaces right after control characters so that lines aren't awkwardly shifted.
+    :param translated_line: Current line from the translated script
+    :param line_number: Current line number for output
+    :return:
+    """
+    global errors
+    match_space = space_after_pointer_regex.findall(translated_line)
+
+    for match in match_space:
+        print("Space after pointer in line " + str(line_number + 1))
+        errors += 1
+
+
+def check_for_double_space_around_highlight(translated_line, line_number):
+    """
+    Sometimes there's a space before and after a highlight character. Avoid this.
+    :param translated_line: Current line from the translated script
+    :param line_number: Current line number for output
+    :return:
+    """
+    global errors
+    match_space = double_space_regex.findall(translated_line)
+
+    for match in match_space:
+        print("Double space around highlight on line " + str(line_number + 1))
+        errors += 1
+
+
+def check_for_double_space(translated_line, line_number):
+    """
+    Sometimes there's a space before and after a highlight character. Avoid this.
+    :param translated_line: Current line from the translated script
+    :param line_number: Current line number for output
+    :return:
+    """
+    global errors
+
+    if "  " in translated_line:
+        print("Double space on line " + str(line_number + 1))
+        errors += 1
+
+
 # Open up both the original and translated files and iterate through them together
 with codecs.open(original_filepath, encoding="shift-jis") as original_file:
     with codecs.open(translated_filepath, encoding="shift-jis") as translated_file:
@@ -150,6 +263,13 @@ with codecs.open(original_filepath, encoding="shift-jis") as original_file:
             check_for_reina_pointer_spacing(translated_line, line_number)
             check_for_highlight_start_spacing(translated_line, line_number)
             check_for_line_length(translated_line, line_number)
+            check_for_space_after_newline(translated_line, line_number)
+            check_for_punctuation_in_highlight(translated_line, line_number)
+            check_for_space_before_punctuation(translated_line, line_number)
+            check_for_new_dialog_spacing(translated_line, line_number)
+            check_for_space_after_pointer(translated_line, line_number)
+            check_for_double_space_around_highlight(translated_line, line_number)
+            check_for_double_space(translated_line, line_number)
 
         print("Complete!")
         print("Total errors encountered: " + str(errors))

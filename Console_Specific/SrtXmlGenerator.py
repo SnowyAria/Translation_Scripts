@@ -50,7 +50,7 @@ def read_directory(directory):
         frame_number = int(re.search(frame_number_regex, path.name).group(1))
 
         # If a frame number could not be parsed, return an error and ignore it
-        if frame_number <= 0:
+        if frame_number < 0:
             print("Could not parse image from " + path.name)
             continue
 
@@ -74,6 +74,7 @@ def write_xml(video_name, frame, output):
         os.makedirs(output)
 
     root = ET.Element("str-replace")
+    root.set("version", "0.2")
     for entry in frame:
         replace = ET.SubElement(root, "replace")
         replace.set("frame", str(entry["frame_number"]))
