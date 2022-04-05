@@ -1,4 +1,4 @@
-===== Video Editing =====
+===== Old Method, Use the STR Subtitler Applier instead!! =====
 ==== Setup ====
   - Use "jPSXdec" to find the video files. Look for "STR" files.
     - You can hit "Select..." with the dropdown next to it set to "all Videos."

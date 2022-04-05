@@ -24,7 +24,7 @@ output_filepath = sys.argv[3]
 
 Path(output_filepath).mkdir(parents=True, exist_ok=True)
 
-frame_number_regex = re.compile(r"\[\d*\]\[(\d*)\]")
+#frame_number_regex = re.compile(r"\[\d*\]\[(\d*)\]")
 
 
 def apply_subtitles():
