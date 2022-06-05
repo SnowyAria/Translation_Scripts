@@ -1,6 +1,6 @@
 @echo off
 echo Playstation STR video subtitle hardcoder
-echo If it doesn't work, go bug SnowyAria
+echo If it doesn't work, go bug @SnowyAria!
 echo:
 
 :: Sets the working directory to the script location
@@ -32,12 +32,12 @@ set ass_filename=""
 echo Scanning the supplied files...
 for %%A in (%*) do (
     if /I "%%~xA" == ".str" (
-        set str_file="%%A"
+        set str_file=%%A
         set str_filename=%%~nA%%~xA
     )
 
     if /I "%%~xA" == ".ass" (
-        set ass_file="%%A"
+        set ass_file=%%A
         set ass_filename=%%~nA%%~xA
     )
 )
@@ -64,12 +64,13 @@ echo:
 echo Creating temp copies of files...
 mkdir output
 mkdir output\frames
+mkdir output\black_frames
 copy %ass_file% output\%ass_filename%
 copy %str_file% output\%str_filename%
 echo:
 
 echo Converting to an uncompressed AVI...
-java -jar tools/jpsxdec/jpsxdec.jar -f output\%str_filename% -i 0 -quality high -vf avi:rgb -up Lanczos3 -dir output
+java -jar tools/jpsxdec/jpsxdec.jar -f output\%str_filename% -i 0 -quality high -vf avi:mjpg -up Lanczos3 -dir output
 echo:
 
 echo Combining subtitles with AVI frames...
@@ -78,20 +79,30 @@ echo Combining subtitles with AVI frames...
 tools\ffmpeg.exe -i "output\%str_filename%[0].avi" -vf subtitles=output\\\\%ass_filename% "output\frames\%str_filename%[0][%%04d].png"
 echo:
 
+echo Creating black subtitle images...
+tools\ffmpeg.exe -i "output\%str_filename%[0].avi" -vf drawbox=color=#000000:t=fill,subtitles=output\\\\%ass_filename% "output\black_frames\%str_filename%[0][%%04d].png"
+echo:
+
 echo Defining an XML insertion file for the subtitled frames...
-python tools\SrtXmlGenerator.py output\frames\ output\
+python tools\SubtitleXmlGenerator.py output\frames\ output\black_frames\ output\
 echo:
 
 echo Inserting the frames into the STR file...
-java -jar tools/jpsxdec/jpsxdec.jar -f output\%str_filename% -i 0 -replaceframes output\%str_filename%.xml
+java -jar tools/jpsxdec/jpsxdec-stupid-edition.jar -f output\%str_filename% -i 0 -replaceframes output\%str_filename%.xml
+echo:
+
+echo Creating a preview AVI...
+java -jar tools/jpsxdec/jpsxdec.jar -f output\%str_filename% -i 0 -quality high -vf avi:mjpg -up Lanczos3 -dir output
 echo:
 
 echo Cleaning up the temporary files...
 del /q output\%str_filename%.xml
-del /q output\%str_filename%[0].avi
+ren output\%str_filename%[0].avi %str_filename%-output-preview.avi
 del /q output\%ass_filename%
+del /q output\black_frames\*
 del /q output\frames\*
 rmdir /q output\frames
+rmdir /q output\black_frames
 del /q *.log
 echo:
 
