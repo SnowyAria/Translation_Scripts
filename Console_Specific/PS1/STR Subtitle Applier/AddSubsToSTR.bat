@@ -34,11 +34,11 @@ for %%A in (%*) do (
     if /I "%%~xA" == ".str" (
         set str_file=%%A
         set str_filename=%%~nA%%~xA
+        set ass_filename=%%~nA.ass
     )
 
     if /I "%%~xA" == ".ass" (
         set ass_file=%%A
-        set ass_filename=%%~nA%%~xA
     )
 )
 
