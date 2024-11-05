@@ -9,6 +9,8 @@ This script is made possible thanks to [jpsxdec](https://github.com/m35/jpsxdec)
 * Python 3
   * Needed to run XML creation code
   * No special modules required
+* jPSXdec
+  * Grab the latest from here, then place the jars in tools\jpsxdec - [jpsxdec](https://github.com/m35/jpsxdec)
 * ffmpeg.exe
   * Too large to include, so download it first and save it in the tools folder
   * https://www.gyan.dev/ffmpeg/builds/

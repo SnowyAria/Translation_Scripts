@@ -20,7 +20,8 @@ search_word = sys.argv[2]
 
 # Convert the search word to Shift-JIS-encoded hex
 search_hex = search_word.encode("shift-jis").hex()
-
+#search_hex = "0000000e0000000e0000000400000004"
+print("Search hex is " + search_hex)
 hit_locations = []
 
 
@@ -31,6 +32,7 @@ def read_directory(directory):
     """
     for path in Path(directory).rglob("*"):
         if path.is_file():
+            #print("Checking file: " + str(path))
             read_file(path)
 
 
@@ -45,7 +47,7 @@ def read_file(file_path):
             hit_locations.append(file.name)
 
 
-print("Scanning for " + search_word + " in " + initial_directory + ":");
+print("Scanning for " + search_word + " in " + initial_directory + ":")
 read_directory(initial_directory)
 print("Complete!\n")
 

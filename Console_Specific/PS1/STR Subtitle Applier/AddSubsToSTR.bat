@@ -88,7 +88,7 @@ python tools\SubtitleXmlGenerator.py output\frames\ output\black_frames\ output\
 echo:
 
 echo Inserting the frames into the STR file...
-java -jar tools/jpsxdec/jpsxdec-stupid-edition.jar -f output\%str_filename% -i 0 -replaceframes output\%str_filename%.xml
+java -jar tools/jpsxdec/jpsxdec.jar -f output\%str_filename% -i 0 -replaceframes output\%str_filename%.xml
 echo:
 
 echo Creating a preview AVI...
