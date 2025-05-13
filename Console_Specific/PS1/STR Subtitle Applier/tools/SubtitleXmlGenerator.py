@@ -95,7 +95,7 @@ def write_xml(video_name, frames, output):
         replace.set("frame", str(frame["frame_number"] - 1))
         #replace.set("tolerance", TOLERANCE)
         #replace.set("mask", mask_filepath)
-        replace.set("rect", ",".join(str(x) for x in frame["frame_bounding_box"]))
+        #replace.set("rect", ",".join(str(x) for x in frame["frame_bounding_box"]))
         replace.text = frame["frame_filepath"]
 
     xml_data = ET.tostring(root).decode()
